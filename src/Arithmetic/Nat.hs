@@ -3,11 +3,16 @@
 {-# language KindSignatures #-}
 {-# language MagicHash #-}
 {-# language ScopedTypeVariables #-}
+{-# language NoStarIsType #-}
+{-# language ExplicitNamespaces #-}
+{-# language TypeInType #-}
 {-# language TypeOperators #-}
 
 module Arithmetic.Nat
   ( -- * Addition
     plus
+    -- * Multiplication
+  , times
     -- * Subtraction
   , monus
     -- * Successor
@@ -33,7 +38,7 @@ import Arithmetic.Types
 import Arithmetic.Unsafe ((:=:)(Eq), type (<=)(Lte))
 import Arithmetic.Unsafe (Nat(Nat),type (<)(Lt))
 import GHC.Exts (Proxy#,proxy#)
-import GHC.TypeNats (type (+),KnownNat,natVal')
+import GHC.TypeNats (type (+), type (*), KnownNat,natVal')
 
 -- | Infix synonym of 'testLessThan'.
 (<?) :: Nat a -> Nat b -> Maybe (a < b)
@@ -70,6 +75,10 @@ testEqual (Nat x) (Nat y) = if x == y
 -- | Add two numbers.
 plus :: Nat a -> Nat b -> Nat (a + b)
 plus (Nat x) (Nat y) = Nat (x + y)
+
+-- | Multiply two numbers.
+times :: Nat a -> Nat b -> Nat (a * b)
+times (Nat x) (Nat y) = Nat (x * y)
 
 -- | The successor of a number.
 succ :: Nat a -> Nat (a + 1)
