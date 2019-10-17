@@ -2,6 +2,7 @@
 {-# language ExplicitForAll #-}
 {-# language KindSignatures #-}
 {-# language MagicHash #-}
+{-# language RankNTypes #-}
 {-# language ScopedTypeVariables #-}
 {-# language NoStarIsType #-}
 {-# language ExplicitNamespaces #-}
@@ -21,6 +22,7 @@ module Arithmetic.Nat
   , testEqual
   , testLessThan
   , testLessThanEqual
+  , testZero
   , (=?)
   , (<?)
   , (<=?)
@@ -28,8 +30,9 @@ module Arithmetic.Nat
   , zero
   , one
   , constant
-    -- * Demote
+    -- * Convert
   , demote
+  , with
   ) where
 
 import Prelude hiding (succ)
@@ -72,6 +75,12 @@ testEqual (Nat x) (Nat y) = if x == y
   then Just Eq
   else Nothing
 
+-- | Is zero equal to this number or less than it?
+testZero :: Nat a -> Either (0 :=: a) (0 < a)
+testZero (Nat x) = case x of
+  0 -> Left Eq
+  _ -> Right Lt
+
 -- | Add two numbers.
 plus :: Nat a -> Nat b -> Nat (a + b)
 plus (Nat x) (Nat y) = Nat (x + y)
@@ -110,3 +119,10 @@ constant = Nat (fromIntegral (natVal' (proxy# :: Proxy# n)))
 -- on top of which it is built.
 demote :: Nat n -> Int
 demote (Nat n) = n
+
+-- | Run a computation on a witness of a type-level number. The
+-- argument 'Int' must be greater than or equal to zero. This is
+-- not checked. Failure to upload this invariant will lead to a
+-- segfault.
+with :: Int -> (forall n. Nat n -> a) -> a
+with i f = f (Nat i)
